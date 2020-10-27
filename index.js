@@ -27,7 +27,8 @@ module.exports = function upgradeToUpdate(require) {
     return originalRequire(module)
   }
 
-  originalRequire.fresh = module => require(module, true)
+  originalRequire.fresh = originalRequire.cache.skip =
+    module => require(module, true)
 
   Object.assign(require, originalRequire)
 
