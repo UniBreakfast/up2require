@@ -1,6 +1,6 @@
 let done = false
 
-module.exports = function upgrade_require_to_update() {
+module.exports = function upgradeToUpdate(require) {
   if (done) return
 
   const originalRequire = require
