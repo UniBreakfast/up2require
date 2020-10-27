@@ -27,7 +27,11 @@ module.exports = function upgrade_require_to_update() {
     return originalRequire(module)
   }
 
-  Object.assign(require, originalRequire)
+  Object.assign(require, originalRequire, {fresh(module) {
+    return require(module, true)
+  }})
 
   done = true
+
+  return require
 }
