@@ -1,38 +1,30 @@
-let done = false
+const {watch} = require('fs')
+
+const reloadingWrappers = {}
+
 
 module.exports = function upgradeToUpdate(require) {
-  if (done) return
-
-  const originalRequire = require
-  const reloadingWrappers = {}
-
-  require = function require(module, watchToReload) {
-    if (watchToReload) {
+  function watchfulRequire(module, reloadUpdated) {
+    if (reloadUpdated) {
+      module = require.resolve(module)
       if (module in reloadingWrappers) {
         return reloadingWrappers[module]
       } else {
-        originalRequire("fs").watch(
-          originalRequire("path").resolve(module),
-          () => delete require.cache[require.resolve(module)]
-        )
+        watch(module, () => delete require.cache[module])
 
         reloadingWrappers[module] = function (...args) {
-          return originalRequire(module).apply(this, args)
+          return require(module).apply(this, args)
         }
-
-        return Object.assign(reloadingWrappers[module], originalRequire(module))
+        return Object.assign(reloadingWrappers[module], require(module))
       }
     }
-
-    return originalRequire(module)
+    return require(module)
   }
 
-  originalRequire.fresh = originalRequire.cache.skip =
-    module => require(module, true)
+  require.fresh = require.cache.untilUpdate =
+    module => watchfulRequire(module, true)
 
-  Object.assign(require, originalRequire)
+  Object.assign(watchfulRequire, require)
 
-  done = true
-
-  return require
+  return watchfulRequire
 }
