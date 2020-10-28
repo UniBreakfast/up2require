@@ -13,6 +13,7 @@ module.exports = function upgradeToUpdate(require) {
         watch(module, () => delete require.cache[module])
 
         reloadingWrappers[module] = function (...args) {
+          if (new.target) return new (require(module))(...args)
           return require(module).apply(this, args)
         }
         return Object.assign(reloadingWrappers[module], require(module))
