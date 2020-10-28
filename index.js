@@ -12,11 +12,15 @@ module.exports = function upgradeToUpdate(require) {
       } else {
         watch(module, () => delete require.cache[module])
 
-        reloadingWrappers[module] = function (...args) {
+        const wrapperFn = function (...args) {
           if (new.target) return new (require(module))(...args)
           return require(module).apply(this, args)
         }
-        return Object.assign(reloadingWrappers[module], require(module))
+
+        const wrapperProxy = new Proxy(wrapperFn, {get(_, prop) {
+          return require(module)[prop]
+        }})
+        return reloadingWrappers[module] = wrapperProxy
       }
     }
     return require(module)

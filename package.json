@@ -1,6 +1,6 @@
 {
   "name": "up2require",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Upgrade-to-Update for the nodejs require() function. It replaces with and/or adds to the normal require way(s) to refresh functions imported with require(module). Function upgradeToUpdate(require) provided by this module returns the replacement function watchfulRequire(module, reloadUpdated) which has the option to clear require.cache for selected modules when they are updated and return wrappers for the imported functions. Those wrappers reload modules each time those are updated.",
   "main": "index.js",
   "scripts": {
