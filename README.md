@@ -42,7 +42,7 @@ so the same way but less declarative, and the more realistic example for me is
 const dev = !process.env.PORT
 const port = dev ? 3000 : process.env.PORT
 
-if (dev) require = require('up2require)(require)
+if (dev) require = require('up2require')(require)
 
 const handleRequest = require('./requestHandler.js', dev)
 
