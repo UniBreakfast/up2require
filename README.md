@@ -6,7 +6,7 @@ The main usage of **up2require** for me is autoreloading of the multiple listene
 
 So what it actually does is it provides a function `upgradeToUpdate(require)` which does exactly that, it upgrades the normal `require(module)` function you passed into it with three new ways to call it to get the required module to always be *fresh* (in sync with the last changes to its file). And if called the usual way like `require(module)` it will act just as the normal one does.
 
-To keep the module always fresh it'll return to you not the loaded module itself but the wrapper around it. That wrapper will do normal `require(module)` inside itself when called as a function or it will act as a proxy if you will try to access some properties or methods on the object returned by your module. And the second thing it'll do is it will watch the module file with some pretty fast OS-magic and when that file changes it will clear the `require.cache` for it. So being accessed again it will be fresh as new (because it will be!).
+To keep the module always fresh it'll return to you not the loaded module itself but the wrapper around it. That wrapper will do normal `require(module)` inside itself when called as a function or it will act as a proxy if you will try to access some properties or methods on the object returned by your module. And the second thing it'll do is it will watch the module file with some pretty fast OS-magic and when that file changes it will clear the `require.cache` for it. So being accessed again it will work according to the current file content.
 
 # Installation
 
@@ -49,13 +49,13 @@ const handleRequest = require('./requestHandler.js', dev)
 require('http').createServer(handleRequest).listen(port)
 ```
 
-Existing `process.env.PORT` here is telling me that it currently runs on heroku and so the autorefresh is pointless, and otherwise it clearly in dev-mode.
+Existing `process.env.PORT` here is telling me that app is currently running on heroku and so the autorefresh is pointless, and otherwise it is clearly in dev-mode.
 
 ### Second way
 Notice that we don't save the upgraded `require` as it available to us
 as a `.fresh(module)` method on the normal one after upgrading.
 Called in this way it doesn't need or take the second agrument, as `fresh` already means
-it requires reloading when module-file is changed.
+that we want it to reload when module-file is changed.
 
 ```js
 require('up2require')(require)
@@ -73,10 +73,10 @@ const fn = devMode? require.fresh('./fn.js') : require('./fn.js')
 ...
 ```
 
-I hope you have **noticed that when going the first two ways you need to `require('up2require')` and call it for the upgrading procedure in every file where you're going to need it.** The reason for that being the way the normal `require(module)` function is provided for us in nodeJS - in every single file/module it's another `require` function made just to be used in it, and it is preloaded with the relative path. So, yeah, we can upgrade it once and use everywhere..., but that means it will look for the modules by the absolute path (or to be exact it will look by the path relative to the file you are upgraded it in, and I hope you are reasonable enough to do it in the entrypoint file). Hence the
+I hope you have noticed that **when going the first two ways you need to `require('up2require')` and call it for the upgrading procedure in every file where you're going to need it.** The reason for that being the way the normal `require(module)` function is provided for us in nodeJS - in every single file/module it's another `require` function made just to be used in it, and it is preloaded with the relative path. So, yeah, we can upgrade it once and use everywhere..., but that means it will look for the modules by the absolute path (or to be exact it will look by the path relative to the file you are upgraded it in, and I hope you are reasonable enough to do it in the entrypoint file). Hence the
 
 ### Third way
-So here we import **up2require** and upgrade the `require` with it only once - in the `index.js`. And again no need to save the upgraded one. The `require` function itself stays normal, but the `.cache` object on it will have the `.untilUpdate(module)` method - that's again another alias for `watchfulRequire(module)`
+So here we import **up2require** and upgrade the `require` with it only once - in the `index.js` at root level in my case. And again no need to save the upgraded one. The `require` function itself stays normal, but the `.cache` object on it will have the `.untilUpdate(module)` method - that's again another alias for `watchfulRequire(module)`
 
 ```js
 require('up2require')(require)
