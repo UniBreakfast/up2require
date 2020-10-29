@@ -19,13 +19,12 @@ module.exports = function upgradeToUpdate(require) {
 
         const wrapperProxy = new Proxy(wrapperFn, {get(_, prop) {
           const value = require(module)[prop]
-          if (typeof value == 'function') {
-            return function (...args) {
-              if (new.target) return new (require(module)[prop])(...args)
-              return require(module)[prop].apply(this, args)
-            }
+          if (typeof value != 'function') return value
+
+          return function (...args) {
+            if (new.target) return new (require(module)[prop])(...args)
+            return require(module)[prop].apply(this, args)
           }
-          return value
         }})
         return reloadingWrappers[module] = wrapperProxy
       }
