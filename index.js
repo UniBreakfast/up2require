@@ -12,12 +12,13 @@ module.exports = function upgradeToUpdate(require) {
       } else {
         watch(module, () => delete require.cache[module])
 
-        const wrapperFn = function (...args) {
-          if (new.target) return new (require(module))(...args)
-          return require(module).apply(this, args)
-        }
+        const wrapper = typeof require(module) == 'function' ?
+          function (...args) {
+            if (new.target) return new (require(module))(...args)
+            return require(module).apply(this, args)
+          } : {}
 
-        const wrapperProxy = new Proxy(wrapperFn, {get(_, prop) {
+        const wrapperProxy = new Proxy(wrapper, {get(_, prop) {
           const value = require(module)[prop]
           if (typeof value != 'function') return value
 
