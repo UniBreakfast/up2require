@@ -1,4 +1,6 @@
-# up2require means "upgrade-to-update" for require()
+# [up2require](https://github.com/UniBreakfast/up2require)
+
+## up2require means "upgrade-to-update" for require()
 
 And that means that you get an option for some of your commonJS modules (you choose which ones) to auto-reload if you are developing locally and just made some changes to the module file. So no need to restart the whole server to see the changes every time (you still need to restart it to see the changes you made to the rest of your modules or to the entrypoint-file to take effect of course).
 
